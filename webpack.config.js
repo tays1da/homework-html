@@ -9,29 +9,58 @@ module.exports = {
 
         rules: [
             {
-                test: /\.css$/i,
+                test: /\.module\.css$/i,
                 include: [
                     path.resolve(__dirname, 'src')
                 ],
                 use: [
-                    'style-loader',
                     {
                         loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            esModule: false
-                        }
                     },
                     {
-                        loader: "css-loader"
+                        loader: "css-loader",
+                        options: {
+                            modules: true
+                        }
                     },
                     'postcss-loader'
                 ],
             },
             {
-                test: /\.html$/i,
-                loader: "html-loader",
+                test: /\.css$/i,
+                include: [
+                    path.resolve(__dirname, 'src')
+                ],
+                exclude: /\.module\.css$/i,
+                use: [
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                    },
+                    {
+                        loader: "css-loader",
+                    },
+                    'postcss-loader'
+                ],
+            },
+            {
+                test: /\.(js|jsx)$/i,
+                include: [
+                    path.resolve(__dirname, 'src')
+                ],
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            '@babel/preset-env',
+                            '@babel/preset-react'
+                        ]
+                    }
+                }
             },
         ],
+    },
+    resolve: {
+        extensions: ['.js', '.jsx']
     },
     output: {
         filename: 'main.js',
