@@ -1,34 +1,11 @@
 import { useMemo, useState } from 'react';
 import { ContragentsTable } from './contragents/table/table';
 import { ContragentModal } from './contragents/modal/modal';
+import { useContragents } from '../context/ContragentsContext';
 import * as styles from './app.module.css';
 
-const contragentsSeed = [
-    {
-        id: 1,
-        name: 'ООО "Альфа Трейд"',
-        inn: '7701234567',
-        address: 'г. Москва, ул. Ленина, 10',
-        kpp: '770101001'
-    },
-    {
-        id: 2,
-        name: 'ИП Петров И.И.',
-        inn: '781234567890',
-        address: 'г. Санкт-Петербург, Невский пр., 28',
-        kpp: '780201001'
-    },
-    {
-        id: 3,
-        name: 'АО "ТехСнаб"',
-        inn: '5409876543',
-        address: 'г. Новосибирск, Красный проспект, 100',
-        kpp: '540901001'
-    }
-];
-
 export function App() {
-    const [contragents, setContragents] = useState(contragentsSeed);
+    const { contragents, isLoading, error, saveContragent, deleteContragent } = useContragents();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContragentId, setEditingContragentId] = useState(null);
 
@@ -50,38 +27,19 @@ export function App() {
         setEditingContragentId(null);
     }
 
-    function handleSaveContragent(contragentPayload) {
-        setContragents((previousContragents) => {
-            if (contragentPayload.id == null) {
-                const nextId = Math.max(...previousContragents.map((contragent) => contragent.id), 0) + 1;
-
-                return [
-                    ...previousContragents,
-                    {
-                        ...contragentPayload,
-                        id: nextId
-                    }
-                ];
-            }
-
-            return previousContragents.map((contragent) => {
-                if (contragent.id === contragentPayload.id) {
-                    return {
-                        ...contragentPayload
-                    };
-                }
-
-                return contragent;
-            });
-        });
-
-        handleCloseModal();
+    async function handleSaveContragent(contragentPayload) {
+        try {
+            await saveContragent(contragentPayload);
+            handleCloseModal();
+        } catch (requestError) {
+        }
     }
 
-    function handleDeleteContragent(id) {
-        setContragents((previousContragents) => {
-            return previousContragents.filter((contragent) => contragent.id !== id);
-        });
+    async function handleDeleteContragent(id) {
+        try {
+            await deleteContragent(id);
+        } catch (requestError) {
+        }
     }
 
     function handleEditContragent(id) {
@@ -118,6 +76,16 @@ export function App() {
 
             <main className="flex-1">
                 <div className="max-w-6xl mx-auto px-4 py-8">
+                    {isLoading && (
+                        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                            Загрузка контрагентов...
+                        </div>
+                    )}
+                    {error && (
+                        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {error}
+                        </div>
+                    )}
                     <ContragentsTable
                         contragents={contragents}
                         onDelete={handleDeleteContragent}
