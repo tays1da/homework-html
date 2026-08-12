@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3001/contragents';
+const API_BASE_URL = '/api/contragents';
 
 async function request(url, options = {}) {
     const response = await fetch(url, {

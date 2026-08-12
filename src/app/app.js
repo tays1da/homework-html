@@ -32,6 +32,7 @@ export function App() {
             await saveContragent(contragentPayload);
             handleCloseModal();
         } catch (requestError) {
+            console.error('Save contragent failed', requestError);
         }
     }
 
@@ -39,6 +40,7 @@ export function App() {
         try {
             await deleteContragent(id);
         } catch (requestError) {
+            console.error('Delete contragent failed', requestError);
         }
     }
 
