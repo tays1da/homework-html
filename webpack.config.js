@@ -5,6 +5,15 @@ const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 
 module.exports = {
     entry: './src/main.js',
+    devServer: {
+        proxy: [
+            {
+                context: ['/api'],
+                target: process.env.API_PROXY_TARGET || 'http://localhost:3001',
+                pathRewrite: { '^/api': '' }
+            }
+        ]
+    },
     module: {
 
         rules: [
